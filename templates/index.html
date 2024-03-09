@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Greenarray | Emails</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    
+
+</head>
+<body>
+    <style>
+            @keyframes slowFlash {
+        from { opacity: 1; }
+        50% { opacity: 0.7; }
+        to { opacity: 1; }
+        }
+
+        .flashing-button {
+        animation: slowFlash 2s infinite ease-in-out;
+        }
+
+    </style>
+    <div class="container mt-3">
+        <div class="row">
+            <img style="width: 20%;" src="https://www.greenarraylabs.com/images/greenarray-logo.jpg" alt="greenarray-logo">
+        
+                <div class="vr" style="padding-right:0px"></div>
+              
+            <h2 class="col-sm-5" style="align-self: center;">Email Service</h2>
+        </div>
+        <h1></h1>
+        <hr>
+        <div class="row" style="justify-content: center;">
+            <div class="col-md-6">
+                <h2>Upload Excel</h2>
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Select File</label>
+                        <input class="form-control" type="file" id="file" name="file">
+                    </div>
+                    <button type="submit" class="btn btn-primary flashing-button">Upload</button>
+                </form>
+                <h4 style="color: green;">{{status}}</h4>
+            </div>
+            
+            <hr style="margin: 20px 0;">
+            
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVFQWjxhNBM9T2GUHqrJhWRNGyQzCegNbj9RW8o/jNLMvKlhOSRm" crossorigin="anonymous"></script>
+</body>
+</html>

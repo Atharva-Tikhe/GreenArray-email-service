@@ -1,18 +1,27 @@
 import smtplib, ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import os
+import dotenv
+import logging
 
 
-def send_mail(doc_name, test, patient_name, cust_name, clin_name, booking_date, samp_col_date, rep_date, email):
-  sender_email = "atharvatikhe22@gmail.com"
+logging.basicConfig(filename='email.log', level=logging.DEBUG,
+                    format='%(asctime)s %(levelname)s %(name)s %(message)s')
+
+# Define a logger for your application
+logger = logging.getLogger(__name__)
+
+dotenv.load_dotenv('settings.env')
+
+def send_mail(patient_id, patient_name, test, clin_name, org_name, samp_col_date, samp_recd_date,TAT_date, email):
+  sender_email = os.environ.get("SENDER_EMAIL")
 
   message = MIMEMultipart("alternative")
   message["From"] = sender_email
   message["To"] = email
 
-  message["Subject"] = f"Sample for {test} received!"
-  if doc_name == None:
-    doc_name = 'Dr. ABC'
+  message["Subject"] = f"Sample for {test} received at Greenarray"
  
   html = f"""\
 <!doctype html>
@@ -89,7 +98,7 @@ def send_mail(doc_name, test, patient_name, cust_name, clin_name, booking_date, 
                   <tbody>
                     <tr>
                       <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
-                        <div style="font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:16px;font-weight:900;line-height:1;text-align:left;color:#000000;">Dear {doc_name},</div>
+                        <div style="font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:16px;font-weight:900;line-height:1;text-align:left;color:#000000;">Dear {clin_name},</div>
                       </td>
                     </tr>
                     <tr>
@@ -118,30 +127,30 @@ def send_mail(doc_name, test, patient_name, cust_name, clin_name, booking_date, 
                   <tbody>
                     <tr>
                       <td align="left" style="font-size:0px;padding:10px 25px;padding-bottom:0;word-break:break-word;">
-                        <table cellpadding="0" cellspacing="0" width="100%" border="0" style="color:#000000;font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:16px;line-height:22px;table-layout:auto;width:100%;border:none;">
+                        <table cellpadding="0" cellspacing="0" width="100%"  style="color:#000000;font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:16px;line-height:22px;table-layout:auto;width:100%;border:none;">
                           <tr style="padding-bottom:100px">
                             <th style="text-align: left;">Patient Name: </th>
                             <td style="text-align: left">{patient_name}</td>
                           </tr>
                           <tr style="padding-bottom:100px">
-                            <th style="text-align: left;">Customer Name: </th>
-                            <td style="text-align: left;">{cust_name}</td>
-                          </tr>
-                          <tr style="padding-bottom:10px">
                             <th style="text-align: left;">Clinician Name: </th>
                             <td style="text-align: left;">{clin_name}</td>
                           </tr>
                           <tr style="padding-bottom:10px">
-                            <th style="text-align: left;">Order Booking Date: </th>
-                            <td style="text-align: left;">{booking_date}</td>
+                            <th style="text-align: left;">Organisation Name: </th>
+                            <td style="text-align: left;">{org_name}</td>
                           </tr>
                           <tr style="padding-bottom:10px">
                             <th style="text-align: left;">Sample Collection Date: </th>
-                            <td style="text-align: left;">{samp_col_date}</td>
+                            <td style="text-align: left;">{str(samp_col_date).split(' ')[0]}</td>
                           </tr>
                           <tr style="padding-bottom:10px">
-                            <th style="text-align: left;">Expected Reporting Date: </th>
-                            <td style="text-align: left;">{rep_date}</td>
+                            <th style="text-align: left;">Sample Received Date: </th>
+                            <td style="text-align: left;">{str(samp_recd_date).split(' ')[0]}</td>
+                          </tr>
+                          <tr style="padding-bottom:10px">
+                            <th style="text-align: left; padding-right:20px">Expected Reporting Date:  </th>
+                            <td style="text-align: left;">{str(TAT_date).split(' ')[0]}</td>
                           </tr>
                         </table>
                       </td>
@@ -259,15 +268,19 @@ def send_mail(doc_name, test, patient_name, cust_name, clin_name, booking_date, 
   part2 = MIMEText(html, "html")
   message.attach(part2)
 
-  print(message["Subject"])
-  port = 465
-  password = "pjkh papn cjye ytjx"
+  port = os.environ.get('PORT')
+  password = os.environ.get('PASS')
   context = ssl.create_default_context()
 
   with smtplib.SMTP_SSL("smtp.gmail.com", port, context = context) as server:
       server.login(sender_email, password)
-      server.sendmail(sender_email, email, message.as_string())
-      print(f'email sent to: {email}')
+      try:
+        server.sendmail(sender_email, email, message.as_string())
+        logger.info(msg=f'Email ({email}) sent successfully')
+      except (smtplib.SMTPException, smtplib.SMTPSenderRefused, smtplib.SMTPAuthenticationError) as e:
+        logger.error(msg=f'Error sending email to {email}: {e}')
+        
+      
 
 # def get_data():
 #     """Import the excel sheet as pandas df -- perform data cleaning if required; else send each row to send_mail()"""

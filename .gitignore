@@ -1,0 +1,11 @@
+*.xlsx
+*.spec
+*.env
+*.log
+__pycache__/
+
+build
+dist
+trash
+html_examples
+.ipynb_checkpoints
