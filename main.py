@@ -1,4 +1,5 @@
 import pandas as pd
+import os
 from send_email import send_mail
 
 def import_excel(filepath):
@@ -6,12 +7,13 @@ def import_excel(filepath):
     
     for _, row in excel.iterrows():
         row = row.to_list()
-        send_mail(row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8])
+        row[9] = [bcc.strip() for bcc in row[9].split(',')]
+        send_mail(row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9])
     
 def check_cols(filepath):
     df = pd.read_excel(filepath)
     df = list(df.columns)
-    df2 = pd.read_csv('col_check/cols.csv')
+    df2 = pd.read_csv(os.path.join('col_check', 'cols.csv'))
     df2 = list(df2.columns)
     
     col_check = []
@@ -34,5 +36,5 @@ def check_cols(filepath):
 
 
 
-# check_cols("uploads/1eee3215-31fb-47fd-a2d9-cee7f883791bcols.xlsx")
+# check_cols("sampledata copy.xlsx")
 # import_excel('sampledata copy.xlsx')

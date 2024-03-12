@@ -10,5 +10,6 @@
 - Send trial run to Dr. Anita/me
 - Make exe
     - Exe start point to start flask and launch browser to the localhost address.
+    - 
 
 

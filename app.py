@@ -20,12 +20,13 @@ def index():
             unique_id = str(uuid.uuid4())  # Use uuid for unique ID generation
             new_filename = f"{unique_id}{filename}{extension}"
             
-            f.save(f'uploads/{new_filename}')  # Save file with unique name
+            
+            f.save(os.path.join('uploads', new_filename))
             # Handle successful upload logic here (e.g., display success message)
             
             try:
-                if main.check_cols(f'uploads/{new_filename}'):
-                    main.import_excel(f'uploads/{new_filename}')
+                if main.check_cols(os.path.join('uploads', new_filename)):
+                    main.import_excel(os.path.join('uploads', new_filename))
             except Exception as e:
                 return render_template('index.html', status = f"Columns do not match {e}")
                 
@@ -34,7 +35,13 @@ def index():
         
         return redirect(url_for('index'))  # Redirect to avoid duplicate submissions
 
-    return render_template('index.html', status = "Error with file!")
+    return render_template('index.html', status = "")
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    import subprocess, sys
+    if sys.platform == 'darwin':
+        subprocess.Popen('open http://127.0.0.1:8080', shell=True)
+    elif sys.platform == 'win32':
+        subprocess.Popen('chrome http://127.0.0.1:8080', shell=True)
+    app.run(debug=True, port=8080)
+    

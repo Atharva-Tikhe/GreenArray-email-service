@@ -14,13 +14,12 @@ logger = logging.getLogger(__name__)
 
 dotenv.load_dotenv('settings.env')
 
-def send_mail(patient_id, patient_name, test, clin_name, org_name, samp_col_date, samp_recd_date,TAT_date, email):
+def send_mail(patient_id, patient_name, test, clin_name, org_name, samp_col_date, samp_recd_date,TAT_date, email, bcc):
   sender_email = os.environ.get("SENDER_EMAIL")
 
   message = MIMEMultipart("alternative")
   message["From"] = sender_email
-  message["To"] = email
-
+  message["To"] = email 
   message["Subject"] = f"Sample for {test} received at Greenarray"
  
   html = f"""\
@@ -275,21 +274,9 @@ def send_mail(patient_id, patient_name, test, clin_name, org_name, samp_col_date
   with smtplib.SMTP_SSL("smtp.gmail.com", port, context = context) as server:
       server.login(sender_email, password)
       try:
-        server.sendmail(sender_email, email, message.as_string())
+        server.sendmail(sender_email, [email] + bcc, message.as_string())
         logger.info(msg=f'Email ({email}) sent successfully')
       except (smtplib.SMTPException, smtplib.SMTPSenderRefused, smtplib.SMTPAuthenticationError) as e:
         logger.error(msg=f'Error sending email to {email}: {e}')
         
       
-
-# def get_data():
-#     """Import the excel sheet as pandas df -- perform data cleaning if required; else send each row to send_mail()"""
-#     import pandas as pd
-
-    
-#     df = pd.read_excel('sampledata copy.xlsx')
-
-#     for _, row in df.iterrows():
-#         send_mail(None, row.loc["Test"], row.loc["Patient Name"], row.loc["Organisation"], "Dr", row.loc["Date"], row.loc["Date"], row.loc["Date"], row.loc["email"])
-        
-# get_data()
